@@ -33,20 +33,20 @@ const redisEndpointUri = REDIS_ENDPOINT_URI
 //     password: REDIS_PASSWORD
 // });
 
-const redisCluster = await redis.createCluster({
+const redisClient = redis.createCluster({
     rootNodes: [{
         url: REDIS_ROOT_NODE_URL
     }]
 })
     .on('error', err => console.log('Redis Cluster Error', err)).connect()
 
-const redisClientService = new RedisClient(redisCluster);
+const redisClientService = new RedisClient(redisClient);
 
 app.set('redisClientService', redisClientService);
 
 app.use(
     session({
-        store: new RedisStore({ client: redisCluster }),
+        store: new RedisStore({ client: redisClient }),
         secret: 'someSecret',
         resave: false,
         saveUninitialized: false,
