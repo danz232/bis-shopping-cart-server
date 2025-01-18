@@ -16,10 +16,12 @@ Copy `.env.example` to `.env` file and fill environmental variables
 -   REDIS_PORT: Redis port (default: 6379)
 -   REDIS_HOST: Redis host (default: 127.0.0.1)
 -   REDIS_PASSWORD: Redis password (default: demo)
+-   REDIS_ROOT_NODE_URL: url of Redis Cluster Node
 
 cp .env.example .env
 
 # Run docker compose or install redis with RedisJson module manually. You can also go to https://redislabs.com/try-free/ and obtain necessary environmental variables
+# No need this part if you are not using Redis on Docker
 
 docker network create global
 docker-compose up -d --build

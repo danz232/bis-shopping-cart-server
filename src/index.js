@@ -12,7 +12,7 @@ const RedisClient = require('./services/RedisClient');
 
 require('dotenv').config();
 
-const { REDIS_ENDPOINT_URI, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, PORT } = process.env;
+const { REDIS_ENDPOINT_URI, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, PORT, REDIS_ROOT_NODE_1, REDIS_ROOT_NODE_2 } = process.env;
 
 const app = express();
 
@@ -29,21 +29,24 @@ const redisEndpointUri = REDIS_ENDPOINT_URI
     ? REDIS_ENDPOINT_URI.replace(/^(redis\:\/\/)/, '')
     : `${REDIS_HOST}:${REDIS_PORT}`;
 
-const redisClient = redis.createClient(`redis://${redisEndpointUri}`, {
-    password: REDIS_PASSWORD
-});
+// const redisClient = redis.createClient(`redis://${redisEndpointUri}`, {
+//     password: REDIS_PASSWORD
+// });
 
-redisClient.connect()
+const redisCluster = await redis.createCluster({
+    rootNodes: [{
+        url: REDIS_ROOT_NODE_URL
+    }]
+})
+    .on('error', err => console.log('Redis Cluster Error', err)).connect()
 
-console.log("OK")
-
-const redisClientService = new RedisClient(redisClient);
+const redisClientService = new RedisClient(redisCluster);
 
 app.set('redisClientService', redisClientService);
 
 app.use(
     session({
-        store: new RedisStore({ client: redisClient }),
+        store: new RedisStore({ client: redisCluster }),
         secret: 'someSecret',
         resave: false,
         saveUninitialized: false,
